@@ -1,2 +1,2 @@
-# blacksite
-Blacksite: Distributed Deep Neural Network Artificial Immune System
+# Grizzly
+Second layer of defense in Blacksite framework
