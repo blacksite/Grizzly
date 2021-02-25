@@ -1,1 +1,0 @@
-Used median and mad of all samples to randomly generate feature ranges for detectors using 1 mad.
