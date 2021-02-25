@@ -26,18 +26,17 @@ class DetectorSet:
         training_x, training_y = self.data_set.instances_x[self.type], self.data_set.instances_y[self.type]
 
         self.model.fit(np.array(training_x, dtype='f4'), np.array(training_y, dtype='i4'), self.data_set.classes,
-                  self.data_set.number_of_features, self.dnn, self.data_set.mean_mad,
+                  self.data_set.number_of_features, self.dnn, self.data_set.min_max[self.type],
                   number_of_detectors=self.number_of_detectors)
 
         for d in self.model.detector_objects:
-            self.writer.write(str(d.value[0]))
-            for i in range(1, len(d.value)):
-                self.writer.write(',' + str(d.value[i]))
+            value = d.get_value()
+            self.writer.write(str(value[0][0]) + ',' + str(value[0][1]))
+            for i in range(1, len(value)):
+                self.writer.write(',' + str(value[i][0]) + ',' + str(value[i][1]))
             self.writer.write('\n')
 
         self.writer.flush()
         self.writer.close()
 
         self.model.teardown()
-
-        del self.model

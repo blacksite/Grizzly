@@ -36,15 +36,15 @@ class DNN:
 
     def train_dnn(self):
 
-        print("Starting dnn training for partition " +str(self.type))
+        print("Starting dnn training for " +str(self.type))
 
         # create training and testing x and y datasets from the kFolds
         training_x, training_y = self.data_set.instances_x[self.type], self.data_set.instances_y[self.type]
 
         # begin training the models
-        self.model.fit(np.array(training_x), np.array(training_y), self.batch_size, epochs=100, verbose=2)
+        self.model.fit(np.array(training_x), np.array(training_y), self.batch_size, epochs=100, verbose=0)
 
-        print("Finished dnn training " + str(self.type))
+        print("Finished dnn training for " + str(self.type))
 
     def save_dnn(self):
         self.model.save("../out/" + self.file_name)

@@ -12,3 +12,5 @@ data/Day6.csv
 data/Day7.csv
 data/Day8.csv
 data/Day9.csv
+out/FTP-BruteForce.csv
+out/SSH-Bruteforce.csv

@@ -19,6 +19,7 @@ class DataSet:
         self.number_of_features = 76
         self.number_of_classes = 0
         self.mean_mad = []
+        self.min_max = {}
         self.classes = []
 
     def read_from_file(self, w, filename):
@@ -79,8 +80,6 @@ class DataSet:
         scalar.fit(x)
         x_normalized = scalar.transform(x)
 
-        self.calculate_total_mean_mad(x_normalized)
-
         # Print the min vector and max vector to be read in by Panda
         w.write(str(scalar.data_min_[0]))
         for i in range(1, len(scalar.data_min_)):
@@ -116,6 +115,8 @@ class DataSet:
             else:
                 self.instances_y[y[i]].append(1)
 
+        self.calculate_mean_stdev()
+
         # Add random benign sample to each malicious instance data set
         for key, value in self.instances_x.items():
             if key != 'Benign':
@@ -132,20 +133,26 @@ class DataSet:
         del self.instances_x['Benign']
         del self.instances_y['Benign']
 
-    def calculate_total_mean_mad(self, x):
-        for idx in zip(*x):
-            mean = sum(idx) / len(idx)
-            median = statistics.median(idx)
-            std = statistics.stdev(idx)
-            mad = stats.median_absolute_deviation(idx)
 
-            max_val = max(idx)
-            min_val = min(idx)
+    def calculate_mean_stdev(self):
 
-            self.mean_mad.append((median, mad))
+        num_mal = 0
+        for key, value in self.instances_x.items():
+            if key != 'Benign':
+                temp = []
+                num_mal = num_mal + len(value)
 
-    def get_mean_mad(self):
-        return self.mean_mad
+                i = 0
+                for idx in zip(*value):
+                    max_val = max(idx)
+                    min_val = min(idx)
+
+                    temp.append((min_val, max_val))
+
+                    i += 1
+                self.min_max[key] = temp
+
+        return num_mal
 
     def get_number_of_features(self):
         return self.number_of_features

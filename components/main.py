@@ -39,7 +39,7 @@ def start():
 
     for key, value in data_set.instances_x.items():
         if key != 'Benign':
-                writers[key] = open(out_directory + "/" + key + ".csv", "w")
+            writers[key] = open(out_directory + "/" + key + ".csv", "w")
 
         try:
             dnn_models[key] = DNN(key, data_set)
