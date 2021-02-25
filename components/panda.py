@@ -10,7 +10,7 @@ class DetectorSet:
         self.dnn = dnn
         self.data_set = data_set
         self.writer = writer
-        self.number_of_detectors = 100000
+        self.number_of_detectors = 1000
 
         self.model = self.define_model()
 
@@ -29,6 +29,7 @@ class DetectorSet:
                   self.data_set.number_of_features, self.dnn, self.data_set.min_max[self.type],
                   number_of_detectors=self.number_of_detectors)
 
+        self.writer.write(str(self.model.best_r_value) + '\n')
         for d in self.model.detector_objects:
             value = d.get_value()
             self.writer.write(str(value[0][0]) + ',' + str(value[0][1]))

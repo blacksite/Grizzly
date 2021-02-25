@@ -12,6 +12,7 @@ from scipy import stats
 class DataSet:
 
     def __init__(self):
+        global number_of_features
         self.lock = threading.Lock()
         self.data_set = []
         self.instances_x = {}

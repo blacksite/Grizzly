@@ -14,7 +14,7 @@ from cache.dataset import DataSet
 class DNN:
 
     def __init__(self, type, data_set):
-        self.file_name = type + '.dnn'
+        self.file_name = "../out/" + type + '.dnn'
         self.batch_size = 80
         self.type = type
         self.data_set = data_set
@@ -44,10 +44,11 @@ class DNN:
         # begin training the models
         self.model.fit(np.array(training_x), np.array(training_y), self.batch_size, epochs=100, verbose=0)
 
+        self.save_dnn()
         print("Finished dnn training for " + str(self.type))
 
     def save_dnn(self):
-        self.model.save("../out/" + self.file_name)
+        self.model.save(self.file_name)
 
     def load_dnn(self, filename):
         while True:
