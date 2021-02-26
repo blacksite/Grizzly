@@ -35,8 +35,8 @@ def start():
     # filename = '../data/Day1.csv,../data/Day2.csv,../data/Day3.csv,../data/Day4.csv,../data/Day5.csv,' \
     #            '../data/Day8.csv,../data/Day9.csv,../data/Day10.csv'
     # filename = '../data/Day2.csv,../data/Day3.csv,../data/Day4.csv,../data/Day5.csv'
-    # filename = '../data/Day1.csv'
-    filename = '../data/test.csv'
+    filename = '../data/Day3.csv,../data/Day4.csv'
+    # filename = '../data/test.csv'
     w_minmax = open(out_directory + "/min_max.csv", "w")
 
     data_set.read_from_file(w_minmax, filename)

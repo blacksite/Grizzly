@@ -8,6 +8,7 @@ from keras.utils import np_utils
 import random
 import statistics
 from scipy import stats
+import math
 
 class DataSet:
 
@@ -67,10 +68,13 @@ class DataSet:
         x, y = [], []
 
         for d in self.data_set:
-            x.append(np.array(d[3:-1]))
-            y.append(d[-1])
-            if "Flow Duration" in d[3:-1]:
-                print(str(d[3:-1]))
+            if "LOIC-UDP".lower() not in d[-1].lower() and "Infiltration".lower() not in d[-1].lower() and "Bot".lower() not in d[-1].lower():
+                x.append(np.array(self.replace_nan_inf(d[3:-1])))
+                y.append(d[-1])
+                if "Flow Duration" in d[3:-1]:
+                    print(str(d[3:-1]))
+
+
 
         # Convert X and Y into numpy arrays
         x = np.array(x, dtype='f8')
@@ -157,3 +161,14 @@ class DataSet:
 
     def get_number_of_features(self):
         return self.number_of_features
+
+    def replace_nan_inf(self, x):
+        for i in range(len(x)):
+            val = float(x[i])
+
+            if math.isinf(val) or math.isnan(val):
+                x[i] = 0.0
+                # print(val)
+            else:
+                x[i] = val
+        return x
