@@ -14,3 +14,58 @@ data/Day8.csv
 data/Day9.csv
 out/FTP-BruteForce.csv
 out/SSH-Bruteforce.csv
+out.zip
+out/Brute Force -Web.csv
+out/Brute Force -Web.dnn/saved_model.pb
+out/Brute Force -Web.dnn/variables/variables.data-00000-of-00001
+out/Brute Force -Web.dnn/variables/variables.index
+out/Brute Force -XSS.csv
+out/Brute Force -XSS.dnn/saved_model.pb
+out/Brute Force -XSS.dnn/variables/variables.data-00000-of-00001
+out/Brute Force -XSS.dnn/variables/variables.index
+out/DDOS attack-HOIC.csv
+out/DDOS attack-HOIC.dnn/saved_model.pb
+out/DDOS attack-HOIC.dnn/variables/variables.data-00000-of-00001
+out/DDOS attack-HOIC.dnn/variables/variables.index
+out/DDoS attacks-LOIC-HTTP.csv
+out/DDoS attacks-LOIC-HTTP.dnn/saved_model.pb
+out/DDoS attacks-LOIC-HTTP.dnn/variables/variables.data-00000-of-00001
+out/DDoS attacks-LOIC-HTTP.dnn/variables/variables.index
+out/DoS attacks-GoldenEye.csv
+out/DoS attacks-GoldenEye.dnn/saved_model.pb
+out/DoS attacks-GoldenEye.dnn/variables/variables.data-00000-of-00001
+out/DoS attacks-GoldenEye.dnn/variables/variables.index
+out/DoS attacks-Hulk.csv
+out/DoS attacks-Hulk.dnn/saved_model.pb
+out/DoS attacks-Hulk.dnn/variables/variables.data-00000-of-00001
+out/DoS attacks-Hulk.dnn/variables/variables.index
+out/DoS attacks-SlowHTTPTest.csv
+out/DoS attacks-SlowHTTPTest.dnn/saved_model.pb
+out/DoS attacks-SlowHTTPTest.dnn/variables/variables.data-00000-of-00001
+out/DoS attacks-SlowHTTPTest.dnn/variables/variables.index
+out/DoS attacks-Slowloris.csv
+out/DoS attacks-Slowloris.dnn/saved_model.pb
+out/DoS attacks-Slowloris.dnn/variables/variables.data-00000-of-00001
+out/DoS attacks-Slowloris.dnn/variables/variables.index
+out/FTP-BruteForce.csv
+out/FTP-BruteForce.dnn
+out/FTP-BruteForce.dnn/saved_model.pb
+out/FTP-BruteForce.dnn/variables/variables.data-00000-of-00001
+out/FTP-BruteForce.dnn/variables/variables.index
+out/Infilteration.csv
+out/Infilteration.dnn/saved_model.pb
+out/Infilteration.dnn/variables/variables.data-00000-of-00001
+out/Infilteration.dnn/variables/variables.index
+out/min_max.csv
+out/SQL Injection.csv
+out/SQL Injection.dnn/saved_model.pb
+out/SQL Injection.dnn/variables/variables.data-00000-of-00001
+out/SQL Injection.dnn/variables/variables.index
+out/SSH-Bruteforce.dnn
+out/SSH-Bruteforce.dnn/saved_model.pb
+out/SSH-Bruteforce.dnn/variables/variables.data-00000-of-00001
+out/SSH-Bruteforce.dnn/variables/variables.index
+out/FTP-BruteForce.csv
+out/FTP-BruteForce.dnn
+out/min_max.csv
+out/SSH-Bruteforce.dnn

@@ -13,15 +13,13 @@ from cache.dataset import DataSet
 
 class DNN:
 
-    def __init__(self, type, data_set):
-        self.file_name = "../out/" + type + '.dnn'
+    def __init__(self, key, data_set=None):
+        self.file_name = "../out/" + key + '.dnn'
         self.batch_size = 80
-        self.type = type
+        self.key = key
         self.data_set = data_set
         self.lock = threading.Lock()
-
-        self.model = self.define_model()
-        self.train_dnn()
+        self.model = None
 
     def define_model(self):
         hidden_nodes = int(self.data_set.number_of_features / 2)
@@ -36,16 +34,18 @@ class DNN:
 
     def train_dnn(self):
 
-        print("Starting dnn training for " +str(self.type))
+        print("Starting dnn training for " + str(self.key))
+
+        self.model = self.define_model()
 
         # create training and testing x and y datasets from the kFolds
-        training_x, training_y = self.data_set.instances_x[self.type], self.data_set.instances_y[self.type]
+        training_x, training_y = self.data_set.instances_x[self.key], self.data_set.instances_y[self.key]
 
         # begin training the models
         self.model.fit(np.array(training_x), np.array(training_y), self.batch_size, epochs=100, verbose=0)
 
         self.save_dnn()
-        print("Finished dnn training for " + str(self.type))
+        print("Finished dnn training for " + str(self.key))
 
     def save_dnn(self):
         self.model.save(self.file_name)

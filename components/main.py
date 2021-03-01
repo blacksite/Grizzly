@@ -9,22 +9,54 @@ import logging
 import time
 import threading
 from _thread import *
+from os import walk
 
 
 dnn_models = {}
-data_set = DataSet()
+data_set = None
 HOST, PORT = "localhost", 2021
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((HOST, PORT))
 
+# Ask user if they want to generate and save detectors
+out_directory = '../out'
 
-def start():
-    start = time.time()
 
-    # Ask user if they want to generate and save detectors
-    save_detectors_option = input("Would you like to save generate detectors (y/n): ")
+def dnn_init(option):
+    global dnn_models
+    global out_directory
+    global data_set
 
-    out_directory = '../out'
+    if option == 'y':
+        data_set_init()
+
+        for key, value in data_set.instances_x.items():
+
+            try:
+                dnn_models[key] = DNN(key, data_set)
+                dnn_models[key].train_dnn()
+
+            except Exception as e:
+                logging.error(e)
+                sys.exit(-1)
+    else:
+        directories = []
+        for (dirpath, dirnames, filenames) in walk(out_directory):
+            directories.extend(dirnames)
+            break
+
+        for dir in directories:
+            key = dir[:-4]
+            dnn_models[key] = DNN(key)
+            dnn_models[key].load_dnn(out_directory + '/' + dir)
+
+
+def data_set_init():
+    global data_set
+    global out_directory
+
+    data_set = DataSet()
+
     try:
         os.mkdir(out_directory)
     except OSError:
@@ -32,36 +64,28 @@ def start():
     else:
         print("Successfully created the directory")
 
-    # filename = '../data/Day1.csv,../data/Day2.csv,../data/Day3.csv,../data/Day4.csv,../data/Day5.csv,' \
-    #            '../data/Day8.csv,../data/Day9.csv,../data/Day10.csv'
+    filename = '../data/Day1.csv,../data/Day2.csv,../data/Day3.csv,../data/Day4.csv,../data/Day5.csv,' \
+               '../data/Day6.csv,../data/Day7.csv,../data/Day8.csv,../data/Day9.csv,../data/Day10.csv'
     # filename = '../data/Day2.csv,../data/Day3.csv,../data/Day4.csv,../data/Day5.csv'
-    filename = '../data/Day3.csv,../data/Day4.csv'
+    # filename = '../data/Day3.csv,../data/Day4.csv'
     # filename = '../data/test.csv'
     w_minmax = open(out_directory + "/min_max.csv", "w")
 
     data_set.read_from_file(w_minmax, filename)
 
-    writers = {}
 
+def detectors_init(option):
     global dnn_models
+    global data_set
+    global out_directory
 
-    for key, value in data_set.instances_x.items():
-        if key != 'Benign':
-            writers[key] = open(out_directory + "/" + key + ".csv", "w")
+    if option == 'y':
+        if not data_set:
+            data_set_init()
 
-        try:
-            dnn_models[key] = DNN(key, data_set)
-            if save_detectors_option == 'y' or save_detectors_option == 'Y':
-                DetectorSet(key, data_set, dnn_models[key], writers[key])
-
-        except Exception as e:
-            logging.error(e)
-            # grizzly.save_dnn(save_file)
-            sys.exit(-1)
-
-    end = time.time() - start
-
-    print('Total runtime: ' + str(end) + 's')
+        for key, value in data_set.instances_x.items():
+            writer = open(out_directory + "/" + key + ".csv", "w")
+            DetectorSet(key, data_set, dnn_models[key], writer)
 
 
 def start_server():
@@ -85,13 +109,28 @@ def stop_server():
 
 
 if __name__ == "__main__":
-    start()
-    x = threading.Thread(target=start_server)
-    x.start()
 
-    while True:
-        shutdown = input()
+    start = time.time()
 
-        if shutdown == 'exit':
-            stop_server()
-            break
+    # Ask user if they want to generate and save detectors
+    train_dnn_option = input("Would you like to train a the dnn (y/n)")
+    save_detectors_option = input("Would you like to save generate detectors (y/n): ")
+    start_server_option = input("Would you like to start the server (y/n)")
+
+    dnn_init(train_dnn_option)
+    detectors_init(save_detectors_option)
+
+    end = time.time() - start
+    print('Total runtime: ' + str(end) + 's')
+
+    # Start the server
+    if start_server_option == 'y' or start_server_option == 'Y':
+        x = threading.Thread(target=start_server)
+        x.start()
+
+        while True:
+            shutdown = input()
+
+            if shutdown == 'exit':
+                stop_server()
+                break
