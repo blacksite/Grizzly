@@ -14,7 +14,7 @@ from cache.dataset import DataSet
 class DNN:
 
     def __init__(self, key, data_set=None):
-        self.file_name = "../out/" + key + '.dnn'
+        self.file_name = "../out/" + key
         self.batch_size = 80
         self.key = key
         self.data_set = data_set
@@ -70,3 +70,8 @@ class DNN:
         else:
             print("No DNN available")
             exit(-1)
+
+    def retrain_dnn(self, x, y):
+        self.lock.acquire()
+        self.model.fit(np.array(x), np.array(y), self.batch_size, epochs=100, verbose=0)
+        self.lock.release()
