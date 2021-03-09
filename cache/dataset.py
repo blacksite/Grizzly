@@ -68,13 +68,14 @@ class DataSet:
         x, y = [], []
 
         for d in self.data_set:
-            if "LOIC-UDP".lower() not in d[-1].lower() and "Infiltration".lower() not in d[-1].lower() and "Bot".lower() not in d[-1].lower():
+            if "LOIC-UDP".lower() not in d[-1].lower() and "Infiltration".lower() not in d[-1].lower() and "Bot".lower()\
+                    not in d[-1].lower() and 'Benign'.lower() not in d[-1].lower():
                 x.append(np.array(self.replace_nan_inf(d[3:-1])))
                 y.append(d[-1])
                 if "Flow Duration" in d[3:-1]:
                     print(str(d[3:-1]))
 
-
+        self.add_benign_samples_from_file(x, y)
 
         # Convert X and Y into numpy arrays
         x = np.array(x, dtype='f8')
@@ -138,6 +139,17 @@ class DataSet:
         del self.instances_x['Benign']
         del self.instances_y['Benign']
 
+    def add_benign_samples_from_file(self, x, y):
+        filename = '../data/benign.csv'
+
+        data_frame = pandas.read_csv(filename, engine='python')
+        data_frame.fillna(0)
+
+        data_set = data_frame.values
+
+        for d in data_set.data_set:
+            x.append(np.array(self.replace_nan_inf(d[7:-1])))
+            y.append('Benign')
 
     def calculate_mean_stdev(self):
 
