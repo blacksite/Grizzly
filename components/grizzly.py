@@ -5,21 +5,26 @@ import numpy as np
 from tensorflow import keras
 from os import path
 import threading
-from cache.dataset import DataSet
-
+import sys
+import time
+import properties as props
 
 # Disable GPU otimization
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
+
 class DNN:
 
-    def __init__(self, key, data_set=None):
-        self.file_name = "../out/" + key
+    def __init__(self, out_dir, key, data_set=None):
+        self.file_name = out_dir + '/' + key
         self.batch_size = 80
         self.key = key
         self.data_set = data_set
         self.lock = threading.Lock()
         self.model = None
+        self.queue = []
+        self.retraining_thread = threading.Thread(target=self.retraining_worker)
+        self.continue_retraining = True
 
     def define_model(self):
         hidden_nodes = int(self.data_set.number_of_features / 2)
@@ -47,6 +52,8 @@ class DNN:
         self.save_dnn()
         print("Finished dnn training for " + str(self.key))
 
+        self.retraining_thread.start()
+
     def save_dnn(self):
         self.model.save(self.file_name)
 
@@ -62,16 +69,32 @@ class DNN:
     def classify(self, value):
 
         if self.model:
-                self.lock.acquire()
-                classification = self.model.predict_classes(np.array([value]))[0][0]
-                self.lock.release()
+            self.lock.acquire()
+            classification = int(self.model.predict_classes(np.array([value]))[0][0])
+            self.lock.release()
 
-                return classification
+            return classification
         else:
             print("No DNN available")
-            exit(-1)
+            sys.exit(-1)
 
-    def retrain_dnn(self, x, y):
+    def retrain_dnn(self,):
+        model = self.define_model()
+        x = np.array(self.queue)[:, :-1]
+        y = np.array(self.queue[:, -1])
+        model.fit(x, y, self.batch_size, epochs=100, verbose=0)
         self.lock.acquire()
-        self.model.fit(np.array(x), np.array(y), self.batch_size, epochs=100, verbose=0)
+        self.model = model
         self.lock.release()
+
+    def retraining_worker(self):
+        last_retrain = time.time()
+        while self.continue_retraining:
+            current_time = time.time()
+            if current_time - last_retrain > props.RETRAINING_INTERVAL:
+                self.retrain_dnn()
+                last_retrain = time.time()
+
+    def close(self):
+        self.continue_retraining = False
+        self.save_dnn()

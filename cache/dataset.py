@@ -10,10 +10,10 @@ import statistics
 from scipy import stats
 import math
 
+
 class DataSet:
 
     def __init__(self):
-        global number_of_features
         self.lock = threading.Lock()
         self.data_set = []
         self.instances_x = {}
@@ -68,14 +68,14 @@ class DataSet:
         x, y = [], []
 
         for d in self.data_set:
-            if "LOIC-UDP".lower() not in d[-1].lower() and "Infiltration".lower() not in d[-1].lower() and "Bot".lower()\
-                    not in d[-1].lower() and 'Benign'.lower() not in d[-1].lower():
-                x.append(np.array(self.replace_nan_inf(d[3:-1])))
-                y.append(d[-1])
-                if "Flow Duration" in d[3:-1]:
-                    print(str(d[3:-1]))
+            # if "LOIC-UDP".lower() not in d[-1].lower() and "Infiltration".lower() not in d[-1].lower() and "Bot".lower()\
+            #         not in d[-1].lower() and 'Benign'.lower() not in d[-1].lower():
+            x.append(np.array(self.replace_nan_inf(d[3:-1])))
+            y.append(d[-1])
+            if "Flow Duration" in d[3:-1]:
+                print(str(d[3:-1]))
 
-        self.add_benign_samples_from_file(x, y)
+        # self.add_benign_samples_from_file(x, y)
 
         # Convert X and Y into numpy arrays
         x = np.array(x, dtype='f8')
