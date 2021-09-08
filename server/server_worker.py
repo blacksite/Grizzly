@@ -1,5 +1,5 @@
 import server.dvcp_handler as dvcp
-import server.bgp_handler as bgp
+import server.dgp_handler as bgp
 import properties
 from datetime import datetime
 
@@ -11,15 +11,15 @@ def thread(dnn_models, connection, ip, data_set=None):
     try:
         data = connection.recv(4096)
 
-        version = int(data[properties.VERSION_LOCATION] >> 4)
-        protocol = int(data[properties.PROTOCOL_LOCATION] << 4 >> 4)
-        flags = int(data[properties.FLAGS_LOCATION] >> 4)
+        version = data[properties.VERSION_LOCATION] >> 4
+        protocol = data[properties.PROTOCOL_LOCATION] - (data[properties.PROTOCOL_LOCATION] >> 4 << 4)
+        flags = data[properties.FLAGS_LOCATION] >> 4
 
         if version != 1:
             print("Incompatible BSP version " + str(version))
             return
 
-        first_byte = data[properties.VERSION_LOCATION]
+        first_byte = data[properties.VERSION_LOCATION].to_bytes(1, byteorder='little')
 
         # ---------------------SP---------------------
         if protocol == properties.SP_PROTOCOL:
@@ -27,8 +27,8 @@ def thread(dnn_models, connection, ip, data_set=None):
             if flags == properties.SP_REQUEST_FLAG:
                 # shift the flags left by 4
                 res_flags = 1 << 4
-                second_byte = res_flags.to_bytes(1, 'little')
-                third_fourth_byte = properties.HEADER_SIZE.to_bytes(2, 'little')
+                second_byte = res_flags.to_bytes(1, byteorder='little')
+                third_fourth_byte = properties.HEADER_SIZE.to_bytes(2, byteorder='little')
 
                 res_string = first_byte + second_byte + third_fourth_byte
                 connection.send(res_string)
@@ -52,8 +52,8 @@ def thread(dnn_models, connection, ip, data_set=None):
 
                 # shift the flags left by 4
                 res_flags = 1 << 4
-                second_byte = res_flags.to_bytes(1, 'little')
-                third_fourth_byte = (properties.HEADER_SIZE + 1).to_bytes(2, 'little')
+                second_byte = res_flags.to_bytes(1, byteorder='little')
+                third_fourth_byte = (properties.HEADER_SIZE + properties.BYTE_SIZE).to_bytes(2, byteorder='little')
 
                 res_string = first_byte + second_byte + third_fourth_byte + rtr_string
                 connection.send(res_string)
@@ -72,11 +72,11 @@ def thread(dnn_models, connection, ip, data_set=None):
 
                 # shift the flags left by 4
                 res_flags = 1 << 4
-                second_byte = res_flags.to_bytes(1, 'little')
+                second_byte = res_flags.to_bytes(1, byteorder='little')
                 third_fourth_byte = (
                             properties.HEADER_SIZE +
                             properties.DETECTOR_NUMBER_OF_FLOAT_VALUES * properties.FLOAT_SIZE * properties.BYTE_SIZE)\
-                    .to_bytes(2, 'little')
+                    .to_bytes(2, byteorder='little')
 
                 res_string = first_byte + second_byte + third_fourth_byte + rtr_string
                 connection.send(res_string)

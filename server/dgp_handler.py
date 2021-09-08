@@ -1,9 +1,10 @@
 from common.detector import Detector
 import properties as props
+import struct
 
 
 def reg(dnn_models, data_set, encoded_mal_type):
-    rtr_string = ''
+    rtr_string = bytearray()
 
     while True:
         unencoded_mal_type = data_set.classes[encoded_mal_type]
@@ -19,9 +20,13 @@ def reg(dnn_models, data_set, encoded_mal_type):
         if classification == 1:
             values = detector.get_value()
 
-            for v in values:
-                rtr_string = rtr_string + v.to_btyes(props.FLOAT_SIZE, 'little')
+            for (v1, v2) in values:
+                rtr_string += float_to_bytes(v1) + float_to_bytes(v2)
 
             break
 
     return rtr_string
+
+
+def float_to_bytes(f):
+    return bytearray(struct.pack('<f', f))

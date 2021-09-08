@@ -1,4 +1,5 @@
 import properties as props
+import struct
 
 sample = {}
 UUID_STR = 'DETECTOR_UUID'
@@ -20,9 +21,9 @@ def det(dnn_models, sample_string):
 
         if classification == 1:
             send_validated_sample_to_sys_admin()
-            return bin(1)
+            return (1).to_bytes(1, 'little')
 
-    return bin(0)
+    return (0).to_bytes(1, 'little')
 
 
 def ack(data_set, dnn_models, sample_string):
@@ -89,30 +90,30 @@ def parse_sample(sample_string):
     protocol = sample_string[start]
 
     # Get the remaining bytes for the sample values
-    start = start + props.IP_PROTOCOL_SIZE
-    end = props.SAMPLE_NUMBER_OF_FLOAT_VALUES * props.FLOAT_SIZE
-    encoded_string_values = sample_string[start:end]
-
-    # Hold the values of the sample
+    start += props.IP_PROTOCOL_SIZE
     values = []
-
-    i = 0
-    while i < len(encoded_string_values):
+    for i in range(props.SAMPLE_NUMBER_OF_FLOAT_VALUES):
         # Convert 4 bytes into a float
-        byte_value = ''
-        for x in range(props.FLOAT_SIZE):
-            byte_value = byte_value + encoded_string_values[i]
-            i = i + 1
+        if start + props.FLOAT_SIZE >= len(sample_string):
+            byte_value = sample_string[start:]
+        else:
+            byte_value = sample_string[start:(start + props.FLOAT_SIZE)]
 
-        converted_value = float(byte_value)
+        converted_value = bytes_to_float(byte_value)
 
         # Add the float value to the values list
         values.append(converted_value)
+
+        start += props.FLOAT_SIZE
 
     sample[UUID_STR] = detector_uuid
     sample[SRC_IP_STR] = src_ip
     sample[DST_IP_STR] = dst_ip
     sample[SRC_PORT_STR] = src_port
     sample[DST_PORT_STR] = dst_port
-    sample[PROTOCOL_STR] = protocol
+    sample[PROTOCOL_STR] = protocol.to_bytes(1, 'little')
     sample[VALUES_STR] = values
+
+
+def bytes_to_float(b):
+    return struct.unpack('<f', b)[0]
