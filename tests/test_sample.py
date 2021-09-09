@@ -1,4 +1,4 @@
-import properties as props
+import parameters as props
 import random
 import struct
 import uuid

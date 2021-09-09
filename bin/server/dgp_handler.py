@@ -1,5 +1,5 @@
 from common.detector import Detector
-import properties as props
+import parameters as props
 import struct
 
 

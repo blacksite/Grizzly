@@ -1,6 +1,5 @@
-from concurrent.futures import ThreadPoolExecutor, wait, as_completed
-import threading
-from models import NeuralNetworkNSA
+
+from common.models import NeuralNetworkNSA
 import numpy as np
 
 
@@ -11,7 +10,7 @@ class DetectorSet:
         self.dnn = dnn
         self.data_set = data_set
         self.writer = writer
-        self.number_of_detectors = 100000
+        self.number_of_detectors = 100
 
         self.model = self.define_model()
 
@@ -26,7 +25,7 @@ class DetectorSet:
 
         training_x, training_y = self.data_set.instances_x[self.type], self.data_set.instances_y[self.type]
 
-        self.model.fit(np.array(training_x, dtype='f4'), np.array(training_y, dtype='i4'), self.data_set.classes,
+        self.model.fit(np.array(training_x, dtype='f4'), np.array(training_y, dtype='i4'),
                        self.data_set.number_of_features, self.dnn, self.data_set.min_max[self.type],
                        self.number_of_detectors)
 

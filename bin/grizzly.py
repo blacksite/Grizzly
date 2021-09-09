@@ -7,7 +7,7 @@ from os import path
 import threading
 import sys
 import time
-import properties as props
+import parameters as props
 
 # Disable GPU otimization
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"

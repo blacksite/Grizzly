@@ -1,9 +1,9 @@
-from components.panda import DetectorSet
-from components.grizzly import DNN
-import server.server_worker as handler
+from bin.panda import DetectorSet
+from bin.grizzly import DNN
+import bin.server.server_worker as handler
 import socket
 import sys
-from cache.dataset import DataSet
+from common.dataset import DataSet
 import os
 import logging
 import time
@@ -11,7 +11,7 @@ import threading
 from _thread import *
 from os import walk
 import queue
-import properties as props
+import parameters as props
 
 
 dnn_models = {}
@@ -22,9 +22,9 @@ server.bind((HOST, BPORT))
 queue = queue.Queue()
 
 # Ask user if they want to generate and save detectors
-dnn_out_directory = '../dnn'
+dnn_out_directory = '../bin/dnn'
 ais_out_directory = '../ais'
-data_directory = '../data'
+data_directory = '../../blacksite/data'
 
 
 def dnn_init():
@@ -91,6 +91,9 @@ def data_set_init():
         else:
             for f in files:
                 filename = filename + data_directory + '/' + f + ','
+    else:
+        print('No data directory found')
+        sys.exit(-1)
     #
     # # filename = '../data/Day1.csv,../data/Day2.csv,../data/Day3.csv,../data/Day4.csv,../data/Day5.csv,' \
     # #            '../data/Day6.csv,../data/Day7.csv,../data/Day8.csv,../data/Day9.csv,../data/Day10.csv'
@@ -117,7 +120,7 @@ def detectors_init(option):
     global ais_out_directory
 
     if option == 'y':
-        if not data_set:
+        if len(data_set.classes) <= 0:
             data_set_init()
 
         for key, value in data_set.instances_x.items():

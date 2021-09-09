@@ -1,8 +1,8 @@
 from tests.test_socket import socket
 from tests.test_sample import sample
-import server.server_worker as sw
-import properties as props
-import components.main as main
+import bin.server.server_worker as sw
+import parameters as props
+import bin.main as main
 # import unittest
 
 
@@ -10,6 +10,7 @@ def main_tests():
     try:
         print("Main test - started")
         main.dnn_init()
+        main.data_directory = '../tests/data'
         main.data_set_init()
         print("Main test - finished")
 
