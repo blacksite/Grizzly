@@ -8,11 +8,10 @@ import bin.main as main
 
 def main_tests():
     try:
-        print("Main test - started")
         main.dnn_init()
         main.data_directory = '../tests/data'
         main.data_set_init()
-        print("Main test - finished")
+        print("Main test - success")
 
         return True
     except Exception as e:
@@ -22,20 +21,17 @@ def main_tests():
 
 def status_req_test():
     try:
-        print("SP Request test - started")
         first_byte = (props.DEFAULT_VERSION << 4 | props.SP_PROTOCOL).to_bytes(1, byteorder='little')
 
         res_flags = props.SP_REQUEST_FLAG << 4
         second_byte = res_flags.to_bytes(1, byteorder='little')
         third_fourth_byte = props.HEADER_SIZE.to_bytes(2, byteorder='little')
-        print(third_fourth_byte)
 
         data = first_byte + second_byte + third_fourth_byte
         c = socket(data)
 
         sw.thread(main.dnn_models, c, '127.0.0.1', main.data_set)
-        print(c.data)
-        print("SP Request test - finished")
+        print("SP Request test - success")
 
         return True
     except Exception as e:
@@ -45,7 +41,6 @@ def status_req_test():
 
 def status_res_test():
     try:
-        print("SP Response test - started")
         first_byte = (props.DEFAULT_VERSION << 4 | props.SP_PROTOCOL).to_bytes(1, byteorder='little')
 
         res_flags = props.SP_RESPONSE_FLAG << 4
@@ -56,7 +51,7 @@ def status_res_test():
         c = socket(data)
 
         sw.thread(main.dnn_models, c, '127.0.0.1', main.data_set)
-        print("SP Response test - finished")
+        print("SP Response test - success")
 
         return True
     except Exception as e:
@@ -66,7 +61,6 @@ def status_res_test():
 
 def dvcp_det_test():
     try:
-        print("DVCP Detection test - started")
         first_byte = (props.DEFAULT_VERSION << 4 | props.DVCP_PROTOCOL).to_bytes(1, byteorder='little')
 
         res_flags = props.DVCP_DET_FLAG
@@ -78,8 +72,7 @@ def dvcp_det_test():
         c = socket(data)
 
         sw.thread(main.dnn_models, c, '127.0.0.1', main.data_set)
-        print(c.data)
-        print("DVCP Detection test - finished")
+        print("DVCP Detection test - success")
 
         return True
     except Exception as e:
@@ -89,7 +82,6 @@ def dvcp_det_test():
 
 def dvcp_ack_test():
     try:
-        print("DVCP Acknowledgement test - started")
         first_byte = (props.DEFAULT_VERSION << 4 | props.DVCP_PROTOCOL).to_bytes(1, byteorder='little')
 
         res_flags = props.DVCP_ACK_FLAG << 4
@@ -107,7 +99,7 @@ def dvcp_ack_test():
         c = socket(data)
 
         sw.thread(main.dnn_models, c, '127.0.0.1', main.data_set)
-        print("DVCP Acknowledgement test - finished")
+        print("DVCP Acknowledgement test - success")
 
         return True
     except Exception as e:
@@ -117,7 +109,6 @@ def dvcp_ack_test():
 
 def dgp_reg_test():
     try:
-        print("DGP Regeneration test - started")
         first_byte = (props.DEFAULT_VERSION << 4 | props.DGP_PROTOCOL).to_bytes(1, byteorder='little')
 
         res_flags = props.DGP_REG_FLAG << 4
@@ -129,7 +120,7 @@ def dgp_reg_test():
         c = socket(data)
 
         sw.thread(main.dnn_models, c, '127.0.0.1', main.data_set)
-        print("DGP Regeneration test - finished")
+        print("DGP Regeneration test - success")
 
         return True
     except Exception as e:
@@ -139,7 +130,6 @@ def dgp_reg_test():
 
 def dgp_dev_test():
     try:
-        print("DGP Detector Values test - started")
         first_byte = (props.DEFAULT_VERSION << 4 | props.DGP_PROTOCOL).to_bytes(1, byteorder='little')
 
         res_flags = props.DGP_DEV_FLAG << 4
@@ -151,7 +141,7 @@ def dgp_dev_test():
         c = socket(data)
 
         sw.thread(main.dnn_models, c, '127.0.0.1', main.data_set)
-        print("DGP Detector Values test - finished")
+        print("DGP Detector Values test - success")
 
         return True
     except Exception as e:

@@ -5,9 +5,8 @@ import numpy as np
 
 class DetectorSet:
 
-    def __init__(self, type, data_set, dnn, writer):
-        self.type = type
-        self.dnn = dnn
+    def __init__(self, data_set, validator, writer):
+        self.validator = validator
         self.data_set = data_set
         self.writer = writer
         self.number_of_detectors = 100
@@ -23,11 +22,10 @@ class DetectorSet:
 
     def train_detectors(self):
 
-        training_x, training_y = self.data_set.instances_x[self.type], self.data_set.instances_y[self.type]
+        training_x, training_y = self.data_set.ais_instances_x, self.data_set.ais_instances_y
 
         self.model.fit(np.array(training_x, dtype='f4'), np.array(training_y, dtype='i4'),
-                       self.data_set.number_of_features, self.dnn, self.data_set.min_max[self.type],
-                       self.number_of_detectors)
+                       self.data_set, self.validator, self.number_of_detectors)
 
         self.writer.write(str(self.model.best_r_value) + '\n')
         for d in self.model.detector_objects:

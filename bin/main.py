@@ -2,7 +2,6 @@ from bin.panda import DetectorSet
 from bin.grizzly import DNN
 import bin.server.server_worker as handler
 import socket
-import sys
 from common.dataset import DataSet
 import os
 import logging
@@ -24,7 +23,8 @@ queue = queue.Queue()
 # Ask user if they want to generate and save detectors
 dnn_out_directory = '../bin/dnn'
 ais_out_directory = '../ais'
-data_directory = '../../blacksite/data'
+# data_directory = '../../blacksite/data'
+data_directory = '../tests/data'
 
 
 def dnn_init():
@@ -42,8 +42,9 @@ def dnn_init():
 
         if len(files) > 0:
             for f in files:
-                dnn_models[f] = DNN(dnn_out_directory, f)
-                dnn_models[f].load_dnn(dnn_out_directory + '/' + f)
+                key = f[:-6]
+                dnn_models[key] = DNN(dnn_out_directory, f)
+                dnn_models[key].load_dnn(dnn_out_directory + '/' + f)
             return
 
     option = input("No valid DNNs found. Generate new DNNs: (y/n)")
@@ -53,10 +54,10 @@ def dnn_init():
                 os.mkdir(dnn_out_directory)
             except OSError:
                 print("Creation of DNN directory failed")
-                sys.exit(-1)
+                os._exit(-1)
         data_set_init()
 
-        for key, value in data_set.instances_x.items():
+        for key, value in data_set.dnn_instances_x.items():
 
             try:
                 dnn_models[key] = DNN(dnn_out_directory, key, data_set)
@@ -64,9 +65,9 @@ def dnn_init():
 
             except Exception as e:
                 logging.error(e)
-                sys.exit(-1)
+                os._exit(-1)
     else:
-        sys.exit(-1)
+        os._exit(-1)
 
 
 def data_set_init():
@@ -85,7 +86,7 @@ def data_set_init():
 
         if len(files) == 0:
             print('No data set files found')
-            sys.exit(-1)
+            os._exit(-1)
         elif len(files) == 1:
             filename = data_directory + '/' + files[0]
         else:
@@ -93,7 +94,7 @@ def data_set_init():
                 filename = filename + data_directory + '/' + f + ','
     else:
         print('No data directory found')
-        sys.exit(-1)
+        os._exit(-1)
     #
     # # filename = '../data/Day1.csv,../data/Day2.csv,../data/Day3.csv,../data/Day4.csv,../data/Day5.csv,' \
     # #            '../data/Day6.csv,../data/Day7.csv,../data/Day8.csv,../data/Day9.csv,../data/Day10.csv'
@@ -107,7 +108,7 @@ def data_set_init():
             os.mkdir(ais_out_directory)
         except OSError:
             print("Creation of AIS directory failed")
-            sys.exit(-1)
+            os._exit(-1)
 
     w_minmax = open(ais_out_directory + "/min_max.csv", "w")
 
@@ -123,9 +124,8 @@ def detectors_init(option):
         if len(data_set.classes) <= 0:
             data_set_init()
 
-        for key, value in data_set.instances_x.items():
-            writer = open(ais_out_directory + "/" + key + ".csv", "w")
-            DetectorSet(key, data_set, dnn_models[key], writer)
+        writer = open(ais_out_directory + "/detectors.csv", "w")
+        DetectorSet(data_set, dnn_models, writer)
 
 
 def start_server():
@@ -149,10 +149,9 @@ def stop_servers():
     global server
     global dnn_models
 
-    server.close()
     for key, dnn in dnn_models.items():
-        dnn.close()
-    sys.exit(0)
+        dnn.save_dnn()
+    os._exit(0)
 
 
 if __name__ == "__main__":

@@ -11,4 +11,4 @@ class socket:
         self.data = data
 
     def close(self):
-        print('socket closed')
+        return 0

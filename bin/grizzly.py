@@ -5,7 +5,7 @@ import numpy as np
 from tensorflow import keras
 from os import path
 import threading
-import sys
+import os
 import time
 import parameters as props
 
@@ -16,7 +16,7 @@ import parameters as props
 class DNN:
 
     def __init__(self, out_dir, key, data_set=None):
-        self.file_name = out_dir + '/' + key
+        self.file_name = out_dir + '/' + key + '.model'
         self.batch_size = 80
         self.key = key
         self.data_set = data_set
@@ -44,7 +44,7 @@ class DNN:
         self.model = self.define_model()
 
         # create training and testing x and y datasets from the kFolds
-        training_x, training_y = self.data_set.instances_x[self.key], self.data_set.instances_y[self.key]
+        training_x, training_y = self.data_set.dnn_instances_x[self.key], self.data_set.dnn_instances_y[self.key]
 
         # begin training the models
         self.model.fit(np.array(training_x), np.array(training_y), self.batch_size, epochs=100, verbose=0)
@@ -70,13 +70,13 @@ class DNN:
 
         if self.model:
             self.lock.acquire()
-            classification = int(self.model.predict_classes(np.array([value]))[0][0])
+            classification = int(self.model.predict(np.array([value])) > 0.5)
             self.lock.release()
 
             return classification
         else:
             print("No DNN available")
-            sys.exit(-1)
+            os._exit(-1)
 
     def retrain_dnn(self,):
         model = self.define_model()
