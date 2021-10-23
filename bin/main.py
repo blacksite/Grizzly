@@ -1,6 +1,6 @@
 from bin.panda import DetectorSet
 from bin.grizzly import DNN
-import bin.server.server_worker as handler
+import bin.server.bcp_server as handler
 import socket
 from common.dataset import DataSet
 import os
@@ -15,7 +15,7 @@ import parameters as props
 
 dnn_models = {}
 data_set = DataSet()
-HOST, BPORT = props.LOCALHOST, 1891
+HOST, BPORT = props.IP_ADDRESS_VALIDATOR, 1891
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((HOST, BPORT))
 queue = queue.Queue()
@@ -23,8 +23,8 @@ queue = queue.Queue()
 # Ask user if they want to generate and save detectors
 dnn_out_directory = '../bin/dnn'
 ais_out_directory = '../ais'
-# data_directory = '../../blacksite/data'
-data_directory = '../tests/data'
+data_directory = '../../blacksite/data'
+# data_directory = '../tests/data'
 
 
 def dnn_init():
@@ -42,9 +42,9 @@ def dnn_init():
 
         if len(files) > 0:
             for f in files:
-                key = f[:-6]
+                key = f
                 dnn_models[key] = DNN(dnn_out_directory, f)
-                dnn_models[key].load_dnn(dnn_out_directory + '/' + f)
+                dnn_models[key].load_dnn()
             return
 
     option = input("No valid DNNs found. Generate new DNNs: (y/n)")
@@ -87,11 +87,12 @@ def data_set_init():
         if len(files) == 0:
             print('No data set files found')
             os._exit(-1)
-        elif len(files) == 1:
-            filename = data_directory + '/' + files[0]
         else:
-            for f in files:
-                filename = filename + data_directory + '/' + f + ','
+            filename = data_directory + '/' + files[0]
+
+            for i in range(1, len(files)):
+                filename += ',' + data_directory + '/' + files[i]
+
     else:
         print('No data directory found')
         os._exit(-1)
@@ -121,7 +122,7 @@ def detectors_init(option):
     global ais_out_directory
 
     if option == 'y':
-        if len(data_set.classes) <= 0:
+        if data_set.number_of_classes <= 0:
             data_set_init()
 
         writer = open(ais_out_directory + "/detectors.csv", "w")
@@ -142,7 +143,7 @@ def start_server():
         print('Connected to :', addr[0], ':', addr[1])
 
         # Start a new thread and return its identifier
-        start_new_thread(handler.thread, (dnn_models, data_set, c, addr[0], queue,))
+        start_new_thread(handler.thread, (dnn_models, c, addr[0], data_set,))
 
 
 def stop_servers():

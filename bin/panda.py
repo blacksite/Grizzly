@@ -33,6 +33,7 @@ class DetectorSet:
             self.writer.write(str(value[0][0]) + ',' + str(value[0][1]))
             for i in range(1, len(value)):
                 self.writer.write(',' + str(value[i][0]) + ',' + str(value[i][1]))
+            self.writer.write(',' + str(d.TYPE))
             self.writer.write('\n')
 
         self.writer.flush()

@@ -24,6 +24,7 @@ def reg(dnn_models, data_set, encoded_mal_type):
                 rtr_string += float_to_bytes(v1) + float_to_bytes(v2)
 
             break
+        rtr_string += encoded_mal_type.to_bytes(1, byteorder='little')
 
     return rtr_string
 

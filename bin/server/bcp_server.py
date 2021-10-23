@@ -48,7 +48,7 @@ def thread(dnn_models, connection, ip, data_set=None):
             if flags == parameters.DVCP_DET_FLAG:
                 # DVCP
 
-                rtr_string = dvcp.det(dnn_models, sample_string)
+                rtr_string = dvcp.det(data_set, dnn_models, sample_string)
 
                 # shift the flags left by 4
                 res_flags = 1 << 4
@@ -71,7 +71,7 @@ def thread(dnn_models, connection, ip, data_set=None):
                 rtr_string = dgp.reg(dnn_models, data_set, encoded_mal_type)
 
                 # shift the flags left by 4
-                res_flags = 1 << 4
+                res_flags = parameters.DGP_DEV_FLAG << 4
                 second_byte = res_flags.to_bytes(1, byteorder='little')
                 third_fourth_byte = (
                         parameters.HEADER_SIZE +

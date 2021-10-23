@@ -16,7 +16,7 @@ import parameters as props
 class DNN:
 
     def __init__(self, out_dir, key, data_set=None):
-        self.file_name = out_dir + '/' + key + '.model'
+        self.file_name = out_dir + '/' + key
         self.batch_size = 80
         self.key = key
         self.data_set = data_set
@@ -47,7 +47,7 @@ class DNN:
         training_x, training_y = self.data_set.dnn_instances_x[self.key], self.data_set.dnn_instances_y[self.key]
 
         # begin training the models
-        self.model.fit(np.array(training_x), np.array(training_y), self.batch_size, epochs=100, verbose=0)
+        self.model.fit(np.array(training_x), np.array(training_y), self.batch_size, epochs=100, verbose=2)
 
         self.save_dnn()
         print("Finished dnn training for " + str(self.key))
@@ -55,16 +55,22 @@ class DNN:
         self.retraining_thread.start()
 
     def save_dnn(self):
+        if path.exists(self.file_name):
+            if path.isfile(self.file_name):
+                os.remove(self.file_name)
+            elif path.isdir(self.file_name):
+                os.rmdir(self.file_name)
+
         self.model.save(self.file_name)
 
-    def load_dnn(self, filename):
+    def load_dnn(self):
         while True:
-            if not path.exists(filename):
-                filename = input("The entered file does not exist. Please re-enter a file name\n")
+            if not path.exists(self.file_name):
+                self.file_name = input("The entered file does not exist. Please re-enter a file name\n")
             else:
                 break
 
-        self.model = keras.models.load_model(filename)
+        self.model = keras.models.load_model(self.file_name)
 
     def classify(self, value):
 
