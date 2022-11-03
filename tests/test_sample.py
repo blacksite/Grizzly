@@ -1,4 +1,4 @@
-import properties as props
+import parameters as props
 import random
 import struct
 import uuid
@@ -20,7 +20,7 @@ class sample:
 
         self.src_port = (14567).to_bytes(2, byteorder='little')
         self.dst_port = (80).to_bytes(2, byteorder='little')
-        self.protocol = (1).to_bytes(1, byteorder='little')
+        self.protocol = (6).to_bytes(1, byteorder='little')
 
         self.value = []
         self.generate_sample_values()
