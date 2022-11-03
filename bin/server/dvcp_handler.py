@@ -13,25 +13,37 @@ SRC_PORT_STR = 'SrcPort'
 DST_PORT_STR = 'DstPort'
 PROTOCOL_STR = 'Protocol'
 VALUES_STR = 'VALUES'
-MY_CLIENT = pymongo.MongoClient("mongodb+srv://mongodb-user:fUMVLjfRc6FyOHdw@blacksite.uk2e9.mongodb.net/blacksite?retryWrites=true&w=majority", ssl_cert_reqs=ssl.CERT_NONE)
+TYPE = 'Type'
+MY_CLIENT = pymongo.MongoClient("mongodb+srv://mongodb-user:gRyPhi0hGEq1PYIJ@blacksite.uk2e9.mongodb.net/blacksite?retryWrites=true&w=majority", ssl_cert_reqs=ssl.CERT_NONE)
 MY_DB = MY_CLIENT["blacksite"]
 MY_COL = MY_DB["samples"]
 
 
 def det(data_set, dnn_models, sample_string):
     global sample
-
-    parse_sample(sample_string)
-
-    for key, model in dnn_models.items():
-        classification = model.classify(sample[VALUES_STR])
+    try:
+        # print('Det')
+        parse_sample(sample_string)
+        sample2 = sample
+        classes = data_set.get_classes()
+        key = classes[sample2[TYPE]]
+        classification = dnn_models[key].classify(sample2[VALUES_STR])
+        classification = 0
+        for key, value in dnn_models.items():
+            out = value.classify(sample2[VALUES_STR])
+            if out == 1:
+                classification = 1
+                break
 
         # send_validated_sample_to_sys_admin(data_set)
         if classification == 1:
             send_validated_sample_to_sys_admin(data_set)
             return (1).to_bytes(1, 'little')
 
-    return (0).to_bytes(1, 'little')
+        return (0).to_bytes(1, 'little')
+    except Exception as e:
+        print(e)
+        return (0).to_bytes(1, 'little')
 
 
 def ack(data_set, dnn_models, sample_string):
@@ -59,7 +71,7 @@ def send_validated_sample_to_sys_admin(data_set):
     global MY_COL
     global sample
 
-
+    # print('send')
     src_ip = str(sample[SRC_IP_STR][0]) + "." + str(sample[SRC_IP_STR][1]) + "." + str(sample[SRC_IP_STR][2]) + "." + str(sample[SRC_IP_STR][3])
     src_port = str(int.from_bytes(sample[SRC_PORT_STR], "little"))
     dst_ip = str(sample[DST_IP_STR][0]) + "." + str(sample[DST_IP_STR][1]) + "." + str(sample[DST_IP_STR][2]) + "." + str(sample[DST_IP_STR][3])
@@ -174,52 +186,52 @@ def parse_sample(sample_string):
     global DST_PORT_STR
     global PROTOCOL_STR
     global VALUES_STR
+    global TYPE
 
+    # print('parse')
     sample = {}
 
     # Get the detector UUID
-    start = 0
-    end = props.UUID_SIZE
-    detector_uuid = sample_string[start:end]
+    detector_uuid = sample_string[:props.UUID_SIZE]
+    sample_string = sample_string[props.UUID_SIZE:]
+
+    detector_type = sample_string[0]
+    sample_string = sample_string[1:]
 
     # Get the src and dest ip addresses
-    start = end
-    end = end + props.IP_ADDRESS_SIZE
-    src_ip = sample_string[start:end]
-    start = end
-    end = end + props.IP_ADDRESS_SIZE
-    dst_ip = sample_string[start:end]
+    src_ip = sample_string[:4]
+    sample_string = sample_string[4:]
+    dst_ip = sample_string[:4]
+    sample_string = sample_string[4:]
 
     # Get the src and dst port numbers
-    start = end
-    end = end + props.TCP_UDP_PORT_SIZE
-    src_port = sample_string[start:end]
-    start = end
-    end = end + props.TCP_UDP_PORT_SIZE
-    dst_port = sample_string[start:end]
+    src_port = sample_string[:2]
+    sample_string = sample_string[2:]
+    dst_port = sample_string[:2]
+    sample_string = sample_string[2:]
 
     # Get the protocol value
-    start = end
-    protocol = sample_string[start]
+    protocol = sample_string[0]
+    sample_string = sample_string[1:]
 
     # Get the remaining bytes for the sample values
-    start += props.IP_PROTOCOL_SIZE
     values = []
     for i in range(props.SAMPLE_NUMBER_OF_FLOAT_VALUES):
         # Convert 4 bytes into a float
-        if start + props.FLOAT_SIZE >= len(sample_string):
-            byte_value = sample_string[start:]
+        if props.FLOAT_SIZE >= len(sample_string):
+            byte_value = sample_string
         else:
-            byte_value = sample_string[start:(start + props.FLOAT_SIZE)]
+            byte_value = sample_string[:props.FLOAT_SIZE]
 
         converted_value = bytes_to_float(byte_value)
 
         # Add the float value to the values list
         values.append(converted_value)
 
-        start += props.FLOAT_SIZE
+        sample_string = sample_string[props.FLOAT_SIZE:]
 
     sample[UUID_STR] = detector_uuid
+    sample[TYPE] = detector_type
     sample[SRC_IP_STR] = src_ip
     sample[DST_IP_STR] = dst_ip
     sample[SRC_PORT_STR] = src_port

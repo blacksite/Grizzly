@@ -1,5 +1,4 @@
-from common.detector import Detector
-import parameters as props
+from bin.common.detector import Detector
 import struct
 
 

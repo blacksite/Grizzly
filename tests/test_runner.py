@@ -3,14 +3,89 @@ from tests.test_sample import sample
 import bin.server.bcp_server as sw
 import parameters as props
 import bin.main as main
+import pandas
+import os
+from os import walk
+from os import path
+import numpy as np
 # import unittest
+from sklearn.preprocessing import LabelEncoder
 
 
 def main_tests():
     try:
-        main.dnn_init()
-        main.data_directory = '../tests/data'
-        main.data_set_init()
+
+        main.dnn_init(False)
+
+        data_directory = 'data'
+
+        filename = ''
+        if os.path.isdir(data_directory):
+
+            directories = []
+            files = []
+            for (dirpath, dirnames, files) in walk(data_directory):
+                directories.extend(dirnames)
+                break
+
+            if len(files) == 0:
+                print('No dataset set files found')
+                os._exit(-1)
+            else:
+                filename = data_directory + '/' + files[0]
+
+                for i in range(1, len(files)):
+                    filename += ',' + data_directory + '/' + files[i]
+
+        if filename:
+            # load the dataset
+            dataset = []
+            files = []
+            if ',' in filename:
+                files = filename.split(',')
+            else:
+                files.append(filename)
+
+            for f in files:
+                while True:
+                    if not path.exists(f):
+                        f = input(f + " does not exist. Please re-enter another file name:\n")
+                    else:
+                        break
+                dataframe = pandas.read_csv(f, engine='python')
+                dataframe.fillna(0)
+
+                # if 'Day4' in f:
+                # del dataframe['Index']
+                del dataframe['Flow ID']
+                del dataframe['Src IP']
+                del dataframe['Src Port']
+                del dataframe['Dst IP']
+                dataset.extend(dataframe.values)
+
+        dataset = np.array(dataset)
+        x = dataset[:, 3:-1]
+        x.astype('float32')
+        y = dataset[:, -1]
+
+        x_normalized = main.data_set.scalar.transform(x)
+        # Transform y vector into a matrix
+        encoder = LabelEncoder()
+        encoder.fit(y)
+        y_encoded = encoder.transform(y)
+
+        classifications = {}
+
+        for key, model in main.dnn_models.items():
+            if key not in classifications:
+                classifications[key] = []
+            for samp in x_normalized:
+                out = model.classify(samp)
+                classifications[key].append(out)
+
+        print('Done')
+
+        # main.data_set_init()
         print("Main test - success")
 
         return True
@@ -176,7 +251,7 @@ if __name__ == '__main__':
     assert main_tests()
     # assert status_req_test()
     # assert status_res_test()
-    assert dvcp_det_test()
+    # assert dvcp_det_test()
     # assert dvcp_ack_test()
     # assert dgp_reg_test()
     # assert dgp_dev_test()

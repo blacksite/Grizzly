@@ -8,6 +8,7 @@ import threading
 import os
 import time
 import parameters as props
+import shutil
 
 # Disable GPU otimization
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
@@ -30,7 +31,13 @@ class DNN:
         hidden_nodes = int(self.data_set.number_of_features / 2)
         # create and fit the DNN network
         model = Sequential()
-        model.add(Dense(hidden_nodes, input_dim=self.data_set.number_of_features, activation='relu'))
+        model.add(Dense(hidden_nodes, input_dim=self.data_set.get_number_of_features(), activation='relu'))
+        model.add(Dense(60, activation='relu'))
+        model.add(Dense(50, activation='relu'))
+        model.add(Dense(40, activation='relu'))
+        model.add(Dense(30, activation='relu'))
+        model.add(Dense(20, activation='relu'))
+        model.add(Dense(10, activation='relu'))
         model.add(Dense(1, activation='sigmoid'))
         model.compile(loss='binary_crossentropy', optimizer='adam',
                       metrics=["accuracy", km.TruePositives(), km.FalsePositives(), km.TrueNegatives(),
@@ -47,19 +54,23 @@ class DNN:
         training_x, training_y = self.data_set.dnn_instances_x[self.key], self.data_set.dnn_instances_y[self.key]
 
         # begin training the models
-        self.model.fit(np.array(training_x), np.array(training_y), self.batch_size, epochs=100, verbose=2)
+        self.model.fit(np.array(training_x), np.array(training_y), batch_size=self.batch_size, epochs=100, verbose=2)
 
+        # test_x, test_y = self.data_set.dnn_test_instances_x[self.key], self.data_set.dnn_test_instances_y[self.key]
+        # results = self.model.evaluate(np.array(test_x), np.array(test_y), batch_size=self.batch_size, verbose=2)
+        # for r in results:
+        #     print(str(r) + ' ')
         self.save_dnn()
         print("Finished dnn training for " + str(self.key))
 
-        self.retraining_thread.start()
+        # self.retraining_thread.start()
 
     def save_dnn(self):
         if path.exists(self.file_name):
             if path.isfile(self.file_name):
                 os.remove(self.file_name)
             elif path.isdir(self.file_name):
-                os.rmdir(self.file_name)
+                shutil.rmtree(self.file_name)
 
         self.model.save(self.file_name)
 
@@ -76,13 +87,18 @@ class DNN:
 
         if self.model:
             self.lock.acquire()
-            classification = int(self.model.predict(np.array([value])) > 0.5)
+            out = self.model.predict(np.array([value]))[0][0]
+            if out > 0.5:
+                classification = 1
+            else:
+                classification = 0
+            # classification = int( > 0.5)
             self.lock.release()
 
             return classification
         else:
             print("No DNN available")
-            os._exit(-1)
+            os.exit(-1)
 
     def retrain_dnn(self,):
         model = self.define_model()

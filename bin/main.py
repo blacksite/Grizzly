@@ -2,7 +2,7 @@ from bin.panda import DetectorSet
 from bin.grizzly import DNN
 import bin.server.bcp_server as handler
 import socket
-from common.dataset import DataSet
+from bin.common.dataset import DataSet
 import os
 import logging
 import time
@@ -21,21 +21,24 @@ server.bind((HOST, BPORT))
 queue = queue.Queue()
 
 # Ask user if they want to generate and save detectors
-dnn_out_directory = '../bin/dnn'
+dnn_out_directory = 'dnn'
 ais_out_directory = '../ais'
-data_directory = '../../blacksite/data'
-# data_directory = '../tests/data'
+data_directory = 'data'
+# data_directory = '../tests/dataset'
 
 
-def dnn_init():
+def dnn_init(train_ais):
     global dnn_models
     global dnn_out_directory
     global data_set
 
-    if os.path.isdir(dnn_out_directory):
+    option = input("Generate new DNNs: (y/n)")
 
+    if option == 'n':
+        data_set_init(train_ais, False)
         directories = []
         files = []
+        dirnames = []
         for (dirpath, dirnames, files) in walk(dnn_out_directory):
             directories.extend(dirnames)
             break
@@ -46,16 +49,21 @@ def dnn_init():
                 dnn_models[key] = DNN(dnn_out_directory, f)
                 dnn_models[key].load_dnn()
             return
+        elif len(dirnames) > 0:
+            for d in dirnames:
+                key = d
+                dnn_models[key] = DNN(dnn_out_directory, d)
+                dnn_models[key].load_dnn()
+            return
 
-    option = input("No valid DNNs found. Generate new DNNs: (y/n)")
-    if option == 'y':
+    elif option == 'y':
+        data_set_init(train_ais, True)
         if not os.path.isdir(dnn_out_directory):
             try:
                 os.mkdir(dnn_out_directory)
             except OSError:
                 print("Creation of DNN directory failed")
                 os._exit(-1)
-        data_set_init()
 
         for key, value in data_set.dnn_instances_x.items():
 
@@ -70,7 +78,7 @@ def dnn_init():
         os._exit(-1)
 
 
-def data_set_init():
+def data_set_init(traing_ais, train_dnn):
     global data_set
     global data_directory
     global ais_out_directory
@@ -85,7 +93,7 @@ def data_set_init():
             break
 
         if len(files) == 0:
-            print('No data set files found')
+            print('No dataset set files found')
             os._exit(-1)
         else:
             filename = data_directory + '/' + files[0]
@@ -94,14 +102,14 @@ def data_set_init():
                 filename += ',' + data_directory + '/' + files[i]
 
     else:
-        print('No data directory found')
+        print('No dataset directory found')
         os._exit(-1)
     #
-    # # filename = '../data/Day1.csv,../data/Day2.csv,../data/Day3.csv,../data/Day4.csv,../data/Day5.csv,' \
-    # #            '../data/Day6.csv,../data/Day7.csv,../data/Day8.csv,../data/Day9.csv,../data/Day10.csv'
-    # # filename = '../data/Day2.csv,../data/Day3.csv,../data/Day4.csv,../data/Day5.csv'
-    # # filename = '../data/Day3.csv,../data/Day4.csv'
-    # filename = '../data/test.csv'
+    # # filename = '../dataset/Day1.csv,../dataset/Day2.csv,../dataset/Day3.csv,../dataset/Day4.csv,../dataset/Day5.csv,' \
+    # #            '../dataset/Day6.csv,../dataset/Day7.csv,../dataset/Day8.csv,../dataset/Day9.csv,../dataset/Day10.csv'
+    # # filename = '../dataset/Day2.csv,../dataset/Day3.csv,../dataset/Day4.csv,../dataset/Day5.csv'
+    # # filename = '../dataset/Day3.csv,../dataset/Day4.csv'
+    # filename = '../dataset/test.csv'
 
     # create ais directory if it doesn't exist
     if not os.path.isdir(ais_out_directory):
@@ -113,24 +121,21 @@ def data_set_init():
 
     w_minmax = open(ais_out_directory + "/min_max.csv", "w")
 
-    data_set.read_from_file(w_minmax, filename)
+    data_set.read_from_file(w_minmax, filename, traing_ais, train_dnn)
 
 
-def detectors_init(option):
+def detectors_init():
     global dnn_models
     global data_set
     global ais_out_directory
 
-    if option == 'y':
-        if data_set.number_of_classes <= 0:
-            data_set_init()
-
-        writer = open(ais_out_directory + "/detectors.csv", "w")
-        DetectorSet(data_set, dnn_models, writer)
+    writer = open(ais_out_directory + "/detectors.csv", "w")
+    DetectorSet(data_set, dnn_models, writer)
 
 
 def start_server():
     global server
+    global data_set
 
     server.listen(5)
 
@@ -163,9 +168,12 @@ if __name__ == "__main__":
     generate_detectors_option = input("Generate detectors: (y/n)")
 
     # initialize dnns
-    dnn_init()
-    if generate_detectors_option:
-        detectors_init(generate_detectors_option)
+
+    if generate_detectors_option == 'y':
+        dnn_init(True)
+        detectors_init()
+    else:
+        dnn_init(False)
 
     end = time.time() - start
     print('Total runtime: ' + str(end) + 's')
