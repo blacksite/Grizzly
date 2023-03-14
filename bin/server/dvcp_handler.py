@@ -1,4 +1,4 @@
-import parameters as props
+from Grizzly import parameters as props
 import struct
 import pymongo
 import numpy as np
@@ -14,7 +14,7 @@ DST_PORT_STR = 'DstPort'
 PROTOCOL_STR = 'Protocol'
 VALUES_STR = 'VALUES'
 TYPE = 'Type'
-MY_CLIENT = pymongo.MongoClient("mongodb+srv://mongodb-user:gRyPhi0hGEq1PYIJ@blacksite.uk2e9.mongodb.net/blacksite?retryWrites=true&w=majority", ssl_cert_reqs=ssl.CERT_NONE)
+MY_CLIENT = pymongo.MongoClient("mongodb+srv://mongodb-user:gRyPhi0hGEq1PYIJ@blacksite.uk2e9.mongodb.net/blacksite?retryWrites=true&w=majority")
 MY_DB = MY_CLIENT["blacksite"]
 MY_COL = MY_DB["samples"]
 
@@ -172,7 +172,7 @@ def send_validated_sample_to_sys_admin(data_set):
     mydict["IdleMax"] = unnormalized[74]
     mydict["IdleMin"] = unnormalized[75]
 
-    MY_COL.insert_one(mydict)
+    # MY_COL.insert_one(mydict)
 
     return 1
 

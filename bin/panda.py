@@ -1,5 +1,5 @@
 
-from bin.common.models import NeuralNetworkNSA
+from common.models import NeuralNetworkNSA
 import numpy as np
 
 

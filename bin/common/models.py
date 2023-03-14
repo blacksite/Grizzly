@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, wait
 import numpy as np
 from numba import cuda
 
-from bin.common.detector import Detector
+from .detector import Detector
 
 number_of_threads = 25
 

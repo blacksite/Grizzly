@@ -1,6 +1,6 @@
-import bin.server.dvcp_handler as dvcp
-import bin.server.dgp_handler as dgp
-import parameters
+from . import dvcp_handler as dvcp
+from . import dgp_handler as dgp
+from Grizzly import parameters
 from datetime import datetime
 import select
 

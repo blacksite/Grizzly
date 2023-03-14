@@ -1,8 +1,8 @@
-from bin.panda import DetectorSet
-from bin.grizzly import DNN
-import bin.server.bcp_server as handler
+from panda import DetectorSet
+from grizzly import DNN
+import server.bcp_server as handler
 import socket
-from bin.common.dataset import DataSet
+from common.dataset import DataSet
 import os
 import logging
 import time
@@ -10,7 +10,7 @@ import threading
 from _thread import *
 from os import walk
 import queue
-import parameters as props
+from .. import parameters as props
 
 
 dnn_models = {}
