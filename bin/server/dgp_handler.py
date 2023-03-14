@@ -1,4 +1,4 @@
-from bin.common.detector import Detector
+from common.detector import Detector
 import struct
 
 
