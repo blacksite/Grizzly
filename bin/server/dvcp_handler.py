@@ -1,4 +1,4 @@
-from Grizzly import parameters as props
+import parameters as props
 import struct
 import pymongo
 import numpy as np

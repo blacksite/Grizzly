@@ -1,6 +1,6 @@
 from . import dvcp_handler as dvcp
 from . import dgp_handler as dgp
-from Grizzly import parameters
+import parameters
 from datetime import datetime
 import select
 
