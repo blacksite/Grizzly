@@ -119,6 +119,12 @@ class DNN:
                 self.retrain_dnn()
                 last_retrain = time.time()
 
+    def retraining_worker_samples(self):
+        while self.continue_retraining:
+            if len(self.queue) > props.RETRAINING_INTERVAL_SAMPLES:
+                self.retrain_dnn()
+
+
     def close(self):
         self.continue_retraining = False
         self.save_dnn()
