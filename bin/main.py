@@ -10,12 +10,12 @@ import threading
 from _thread import *
 from os import walk
 import queue
-from .. import parameters as props
+from Grizzly import parameters as props
 
 
 dnn_models = {}
 data_set = DataSet()
-HOST, BPORT = props.IP_ADDRESS_VALIDATOR, 1891
+HOST, BPORT = props.LOCALHOST, 1865
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((HOST, BPORT))
 queue = queue.Queue()
@@ -158,6 +158,7 @@ def stop_servers():
     for key, dnn in dnn_models.items():
         dnn.save_dnn()
     os._exit(0)
+        
 
 
 if __name__ == "__main__":

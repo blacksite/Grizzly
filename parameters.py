@@ -60,4 +60,4 @@ LOCALHOST = 'localhost'
 # DEEP NEURAL NETWORK
 
 RETRAINING_INTERVAL = 60 * 30
-RETRAINING_INTERVAL_SAMPLES = 100000 #change to number of samples
+RETRAINING_SAMPLES_INTERVAL = 100000 #change to number of samples

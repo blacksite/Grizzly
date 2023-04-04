@@ -24,7 +24,7 @@ class DNN:
         self.lock = threading.Lock()
         self.model = None
         self.queue = []
-        self.retraining_thread = threading.Thread(target=self.retraining_worker)
+        self.retraining_thread = threading.Thread(target=self.retraining_worker_samples)
         self.continue_retraining = True
 
     def define_model(self):
@@ -121,7 +121,7 @@ class DNN:
 
     def retraining_worker_samples(self):
         while self.continue_retraining:
-            if len(self.queue) > props.RETRAINING_INTERVAL_SAMPLES:
+            if len(self.queue) > props.RETRAINING_SAMPLES_INTERVAL:
                 self.retrain_dnn()
 
 
