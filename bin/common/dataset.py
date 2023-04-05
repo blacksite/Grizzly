@@ -122,23 +122,22 @@ class DataSet:
         self.number_of_classes = len(encoder.classes_)
         self.save_models()
 
+        # Print the min vector and max vector to be read in by Panda
+        w.write(str(self.scalar.data_min_[0]))
+        for i in range(1, len(self.scalar.data_min_)):
+            w.write(',' + str(self.scalar.data_min_[i]))
+        w.write('\n')
+
+        w.write(str(self.scalar.data_max_[0]))
+        for i in range(1, len(self.scalar.data_max_)):
+            w.write(',' + str(self.scalar.data_max_[i]))
+        w.write('\n')
+
+        w.flush()
+        w.close()
+
         if train_ais or train_dnn:
             x_normalized = self.scalar.transform(x)
-
-            if train_ais:
-                # Print the min vector and max vector to be read in by Panda
-                w.write(str(self.scalar.data_min_[0]))
-                for i in range(1, len(self.scalar.data_min_)):
-                    w.write(',' + str(self.scalar.data_min_[i]))
-                w.write('\n')
-
-                w.write(str(self.scalar.data_max_[0]))
-                for i in range(1, len(self.scalar.data_max_)):
-                    w.write(',' + str(self.scalar.data_max_[i]))
-                w.write('\n')
-
-                w.flush()
-                w.close()
 
             local_instances_x = {}
             local_instances_y = {}
