@@ -63,7 +63,7 @@ class DNN:
         self.save_dnn()
         print("Finished dnn training for " + str(self.key))
 
-        # self.retraining_thread.start()
+        self.retraining_thread.start()
 
     def save_dnn(self):
         if path.exists(self.file_name):
@@ -82,6 +82,8 @@ class DNN:
                 break
 
         self.model = keras.models.load_model(self.file_name)
+
+        self.retraining_thread.start()
 
     def classify(self, value):
 
