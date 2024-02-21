@@ -5,7 +5,7 @@ from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 import threading
 from sklearn.preprocessing import LabelEncoder
-from keras.utils import np_utils
+import np_utils
 import random
 import math
 import statistics as stats

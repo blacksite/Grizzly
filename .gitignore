@@ -74,3 +74,4 @@ bin/data/2022-02-07-collected.csv
 tests/data/2021-12-22-detected.csv
 tests/data/test.csv
 tests/data/test.csv
+.env

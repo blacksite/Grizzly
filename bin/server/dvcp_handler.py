@@ -1,9 +1,13 @@
-from Grizzly import parameters as props
+import parameters as props
 import struct
 import pymongo
 import numpy as np
 import ssl
 import datetime
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 sample = {}
 UUID_STR = 'DetUUID'
@@ -14,7 +18,7 @@ DST_PORT_STR = 'DstPort'
 PROTOCOL_STR = 'Protocol'
 VALUES_STR = 'VALUES'
 TYPE = 'Type'
-MY_CLIENT = pymongo.MongoClient("mongodb+srv://mongodb-user:gRyPhi0hGEq1PYIJ@blacksite.uk2e9.mongodb.net/blacksite?retryWrites=true&w=majority")
+MY_CLIENT = pymongo.MongoClient("mongodb+srv://mcarby991:"+os.environ['MONGODB_SECRET']+"@cluster0.z7en3rk.mongodb.net/?retryWrites=true&w=majority")
 MY_DB = MY_CLIENT["blacksite"]
 MY_COL = MY_DB["samples"]
 

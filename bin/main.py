@@ -10,7 +10,7 @@ import threading
 from _thread import *
 from os import walk
 import queue
-from Grizzly import parameters as props
+import parameters as props
 
 
 dnn_models = {}

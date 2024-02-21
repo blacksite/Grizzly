@@ -7,7 +7,7 @@ from os import path
 import threading
 import os
 import time
-from Grizzly import parameters as props
+import parameters as props
 import shutil
 
 # Disable GPU otimization
